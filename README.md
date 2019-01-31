@@ -19,23 +19,23 @@ int main(int argc, char** argv) {
 
     // Instantiate cxxtimer::Timer object
     cxxtimer::Timer timer;
-    
+
     // Start the timer
     timer.start();
-    
+
     // Wait for the users
     std::string input_1;
     std::cout << "Please, type something and press ENTER to continue: ";
     std::getline(std::cin, input_1);
-    
+
     // Stop/pause the timer
     timer.stop();
-    
+
     // Get the elapsed time
     std::cout << "You took " << timer.count<std::chrono::seconds>() << " seconds." << std::endl;
     std::cout << "You took " << timer.count<std::chrono::milliseconds>() << " milliseconds." << std::endl;
     std::cout << "You took " << timer.count<std::chrono::nanoseconds>() << " nanoseconds." << std::endl;
-    
+
     return 0;
 }
 ```
