@@ -1,6 +1,6 @@
 # cxxtimer: A timer for modern C++
 
-[![Build Status](https://travis-ci.org/andremaravilha/cxxtimer.svg?branch=master)](https://travis-ci.org/andremaravilha/cxxtimer)
+[![Build Status](https://travis-ci.org/tpadioleau/cxxtimer.svg?branch=master)](https://travis-ci.org/tpadioleau/cxxtimer)
 
 This is a header only C++ library that offers an easy-to-use Timer class.
 
