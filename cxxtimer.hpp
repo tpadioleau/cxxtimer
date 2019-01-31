@@ -3,6 +3,7 @@
 MIT License
 
 Copyright (c) 2017 André L. Maravilha
+Copyright (c) 2019 Thomas Padioleau
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,45 +25,48 @@ SOFTWARE.
 
 */
 
-#ifndef CXX_TIMER_HPP
-#define CXX_TIMER_HPP
+#pragma once
 
 #include <chrono>
+#include <string>
 
-
-namespace cxxtimer {
+namespace cxxtimer
+{
 
 /**
  * This class works as a stopwatch.
  */
-class Timer {
-
+class Timer
+{
 public:
+    /**
+     * Constructor.
+     */
+    Timer();
 
     /**
      * Constructor.
      *
-     * @param   start
-     *          If true, the timer is started just after construction.
-     *          Otherwise, it will not be automatically started.
+     * @param   name
+     *          Sets the name of this timer.
      */
-    Timer(bool start = false);
+    Timer(const std::string& name);
 
     /**
      * Copy constructor.
      *
-     * @param   other
+     * @param   x
      *          The object to be copied.
      */
-    Timer(const Timer& other) = default;
+    Timer(const Timer& x) = default;
 
     /**
-     * Transfer constructor.
+     * Move constructor.
      *
-     * @param   other
+     * @param   x
      *          The object to be transfered.
      */
-    Timer(Timer&& other) = default;
+    Timer(Timer&& x) = default;
 
     /**
      * Destructor.
@@ -70,42 +74,47 @@ public:
     virtual ~Timer() = default;
 
     /**
-     * Assignment operator by copy.
+     * Copy assignment operator.
      *
-     * @param   other
+     * @param   x
      *          The object to be copied.
      *
      * @return  A reference to this object.
      */
-    Timer& operator=(const Timer& other) = default;
+    Timer& operator=(const Timer& x) = default;
 
     /**
-     * Assignment operator by transfer.
+     * Move assignment operator.
      *
-     * @param   other
+     * @param   x
      *          The object to be transferred.
      *
      * @return  A reference to this object.
      */
-    Timer& operator=(Timer&& other) = default;
+    Timer& operator=(Timer&& x) = default;
 
     /**
-     * Start/resume the timer.
+     * Starts the timer.
      */
     void start();
 
     /**
-     * Stop/pause the timer.
+     * Stops the timer.
      */
     void stop();
 
     /**
-     * Reset the timer.
+     * Resets the timer.
      */
     void reset();
 
     /**
-     * Return the elapsed time.
+     * Gets name of the timer
+     */
+    std::string name() const;
+
+    /**
+     * Returns the elapsed time.
      *
      * @param   duration_t
      *          The duration type used to return the time elapsed. If not
@@ -118,67 +127,31 @@ public:
     typename duration_t::rep count() const;
 
 private:
+    using clock = std::chrono::steady_clock;
 
-    bool started_;
-    bool paused_;
-    std::chrono::steady_clock::time_point reference_;
-    std::chrono::duration<long double> accumulated_;
+    std::string m_name;
+    bool m_started;
+    bool m_stopped;
+    clock::time_point m_reference;
+    clock::duration m_accumulated;
 };
 
 }
 
-
-inline cxxtimer::Timer::Timer(bool start) :
-        started_(false), paused_(false),
-        reference_(std::chrono::steady_clock::now()),
-        accumulated_(std::chrono::duration<long double>(0)) {
-    if (start) {
-        this->start();
-    }
-}
-
-inline void cxxtimer::Timer::start() {
-    if (!started_) {
-        started_ = true;
-        paused_ = false;
-        accumulated_ = std::chrono::duration<long double>(0);
-        reference_ = std::chrono::steady_clock::now();
-    } else if (paused_) {
-        reference_ = std::chrono::steady_clock::now();
-        paused_ = false;
-    }
-}
-
-inline void cxxtimer::Timer::stop() {
-    if (started_ && !paused_) {
-        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        accumulated_ = accumulated_ + std::chrono::duration_cast< std::chrono::duration<long double> >(now - reference_);
-        paused_ = true;
-    }
-}
-
-inline void cxxtimer::Timer::reset() {
-    if (started_) {
-        started_ = false;
-        paused_ = false;
-        reference_ = std::chrono::steady_clock::now();
-        accumulated_ = std::chrono::duration<long double>(0);
-    }
-}
-
 template <class duration_t>
-typename duration_t::rep cxxtimer::Timer::count() const {
-    if (started_) {
-        if (paused_) {
-            return std::chrono::duration_cast<duration_t>(accumulated_).count();
-        } else {
-            return std::chrono::duration_cast<duration_t>(
-                    accumulated_ + (std::chrono::steady_clock::now() - reference_)).count();
+typename duration_t::rep cxxtimer::Timer::count() const
+{
+    clock::duration duration{};
+    if (m_started)
+    {
+        if (m_stopped)
+        {
+            duration = m_accumulated;
         }
-    } else {
-        return duration_t(0).count();
+        else
+        {
+            duration += clock::now() - m_reference;
+        }
     }
+    return std::chrono::duration_cast<duration_t>(duration).count();
 }
-
-
-#endif

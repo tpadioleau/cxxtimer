@@ -3,6 +3,7 @@
 MIT License
 
 Copyright (c) 2017 André L. Maravilha
+Copyright (c) 2019 Thomas Padioleau
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,30 +26,33 @@ SOFTWARE.
 */
 
 
+#include <chrono>
+#include <cstdlib>
 #include <cxxtimer.hpp>
 #include <iostream>
 #include <string>
 
-int main(int argc, char** argv) {
-
+int main()
+{
     // Instantiate cxxtimer::Timer object
-    cxxtimer::Timer timer;
-    
+    cxxtimer::Timer timer {"Example"};
+
     // Start the timer
     timer.start();
-    
+
     // Wait for the users
-    std::string input_1;
     std::cout << "Please, type something and press ENTER to continue: ";
-    std::getline(std::cin, input_1);
-    
+    std::string input;
+    std::getline(std::cin, input);
+
     // Stop/pause the timer
     timer.stop();
-    
+
     // Get the elapsed time
-    std::cout << "You took " << timer.count<std::chrono::seconds>() << " seconds." << std::endl;
-    std::cout << "You took " << timer.count<std::chrono::milliseconds>() << " milliseconds." << std::endl;
-    std::cout << "You took " << timer.count<std::chrono::nanoseconds>() << " nanoseconds." << std::endl;
-    
-    return 0;
+    std::cout << "Timer \"" << timer.name() << "\" measured " << timer.count<std::chrono::seconds>() << " seconds." << std::endl;
+    std::cout << "Timer \"" << timer.name() << "\" measured " << timer.count<std::chrono::duration<double>>() << " seconds." << std::endl;
+    std::cout << "Timer \"" << timer.name() << "\" measured " << timer.count() << " milliseconds." << std::endl;
+    std::cout << "Timer \"" << timer.name() << "\" measured " << timer.count<std::chrono::nanoseconds>() << " nanoseconds." << std::endl;
+
+    return EXIT_SUCCESS;
 }
