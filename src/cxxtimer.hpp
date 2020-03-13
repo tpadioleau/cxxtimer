@@ -130,7 +130,6 @@ private:
     using clock = std::chrono::steady_clock;
 
     std::string m_name;
-    bool m_started;
     bool m_stopped;
     clock::time_point m_reference;
     clock::duration m_accumulated;
@@ -142,16 +141,9 @@ template <class duration_t>
 typename duration_t::rep cxxtimer::Timer::count() const
 {
     clock::duration duration = m_accumulated;
-    if (m_started)
+    if (!m_stopped)
     {
-        if (m_stopped)
-        {
-            duration = m_accumulated;
-        }
-        else
-        {
-            duration += clock::now() - m_reference;
-        }
+        duration += clock::now() - m_reference;
     }
     return std::chrono::duration_cast<duration_t>(duration).count();
 }

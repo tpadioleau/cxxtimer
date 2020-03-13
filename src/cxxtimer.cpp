@@ -8,8 +8,7 @@ cxxtimer::Timer::Timer()
 
 cxxtimer::Timer::Timer(const std::string& name)
     : m_name {name}
-    , m_started {false}
-    , m_stopped {false}
+    , m_stopped {true}
     , m_reference {clock::now()}
     , m_accumulated {clock::duration::zero()}
 {
@@ -17,23 +16,16 @@ cxxtimer::Timer::Timer(const std::string& name)
 
 void cxxtimer::Timer::start()
 {
-    if (!m_started)
+    if (m_stopped)
     {
-        m_started = true;
-        m_stopped = false;
         m_reference = clock::now();
-        m_accumulated = clock::duration::zero();
-    }
-    else if (m_stopped)
-    {
         m_stopped = false;
-        m_reference = clock::now();
     }
 }
 
 void cxxtimer::Timer::stop()
 {
-    if (m_started && !m_stopped)
+    if (!m_stopped)
     {
         m_accumulated += clock::now() - m_reference;
         m_stopped = true;
@@ -42,13 +34,9 @@ void cxxtimer::Timer::stop()
 
 void cxxtimer::Timer::reset()
 {
-    if (m_started)
-    {
-        m_started = false;
-        m_stopped = false;
-        m_reference = clock::now();
-        m_accumulated = clock::duration::zero();
-    }
+    m_stopped = true;
+    m_reference = clock::now();
+    m_accumulated = clock::duration::zero();
 }
 
 std::string cxxtimer::Timer::name() const
