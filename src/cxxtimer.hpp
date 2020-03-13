@@ -141,7 +141,7 @@ private:
 template <class duration_t>
 typename duration_t::rep cxxtimer::Timer::count() const
 {
-    clock::duration duration{};
+    clock::duration duration = m_accumulated;
     if (m_started)
     {
         if (m_stopped)
