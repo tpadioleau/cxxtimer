@@ -42,7 +42,7 @@ public:
     /**
      * Constructor.
      */
-    Timer();
+    Timer() = default;
 
     /**
      * Constructor.
@@ -129,10 +129,10 @@ public:
 private:
     using clock = std::chrono::steady_clock;
 
-    std::string m_name;
-    bool m_stopped;
-    clock::time_point m_reference;
-    clock::duration m_accumulated;
+    std::string m_name = "Unknown";
+    bool m_stopped = true;
+    clock::time_point m_reference = clock::now();
+    clock::duration m_accumulated = clock::duration::zero();
 };
 
 }

@@ -1,16 +1,8 @@
 #include "cxxtimer.hpp"
 #include <string>
 
-cxxtimer::Timer::Timer()
-    : Timer {"Anonymous"}
-{
-}
-
 cxxtimer::Timer::Timer(const std::string& name)
-    : m_name {name}
-    , m_stopped {true}
-    , m_reference {clock::now()}
-    , m_accumulated {clock::duration::zero()}
+    : m_name ( name )
 {
 }
 
