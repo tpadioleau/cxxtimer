@@ -1,4 +1,4 @@
-#include "cxxtimer.hpp"
+#include "cxxtimer/cxxtimer.hpp"
 #include <string>
 
 cxxtimer::Timer::Timer(const std::string& name)
