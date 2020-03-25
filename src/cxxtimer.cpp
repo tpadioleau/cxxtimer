@@ -31,6 +31,11 @@ void cxxtimer::Timer::reset()
     m_accumulated = clock::duration::zero();
 }
 
+bool cxxtimer::Timer::is_started() const
+{
+    return !m_stopped;
+}
+
 std::string cxxtimer::Timer::name() const
 {
     return m_name;

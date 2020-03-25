@@ -109,6 +109,11 @@ public:
     void reset();
 
     /**
+     * Returns true if started
+     */
+    bool is_started() const;
+
+    /**
      * Gets name of the timer
      */
     std::string name() const;
