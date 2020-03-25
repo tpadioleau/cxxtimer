@@ -58,8 +58,8 @@ public:
 
     TimerNode& operator=(TimerNode&& x) = default;
 
-    Timer timer = {};
-    std::map<std::string, std::shared_ptr<TimerNode>> nodes = {};
+    Timer timer;
+    std::map<std::string, std::shared_ptr<TimerNode>> nodes;
 };
 
 class Profiler
