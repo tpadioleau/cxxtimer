@@ -5,3 +5,7 @@ add_test(NAME simple COMMAND simple)
 add_executable(count_before_stop count_before_stop.cpp)
 target_link_libraries(count_before_stop PRIVATE cxxtimer)
 add_test(NAME count_before_stop COMMAND count_before_stop)
+
+add_executable(profiler profiler.cpp)
+target_link_libraries(profiler PRIVATE cxxtimer)
+add_test(NAME profiler COMMAND profiler)
