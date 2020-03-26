@@ -114,6 +114,16 @@ public:
     bool is_started() const;
 
     /**
+     * Increments number of calls
+     */
+    void increment_num_calls();
+
+    /**
+     * Returns number of calls
+     */
+    std::size_t num_calls() const;
+
+    /**
      * Gets name of the timer
      */
     std::string name() const;
@@ -138,6 +148,7 @@ private:
     bool m_stopped = true;
     clock::time_point m_reference = clock::now();
     clock::duration m_accumulated = clock::duration::zero();
+    std::size_t m_num_calls = 0;
 };
 
 }

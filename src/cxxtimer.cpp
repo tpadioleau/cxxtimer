@@ -29,11 +29,22 @@ void cxxtimer::Timer::reset()
     m_stopped = true;
     m_reference = clock::now();
     m_accumulated = clock::duration::zero();
+    m_num_calls = 0;
 }
 
 bool cxxtimer::Timer::is_started() const
 {
     return !m_stopped;
+}
+
+void cxxtimer::Timer::increment_num_calls()
+{
+    m_num_calls++;
+}
+
+std::size_t cxxtimer::Timer::num_calls() const
+{
+    return m_num_calls;
 }
 
 std::string cxxtimer::Timer::name() const
