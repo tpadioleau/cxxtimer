@@ -26,33 +26,51 @@ std::list<std::string> sort(std::map<std::string, std::shared_ptr<TimerNode>>& n
     return sorted_keys;
 }
 
-void print_impl(std::ostream& os, TimerNode& node, double t_root, double t_parent, int level)
+void print_impl(std::ostream& os, TimerNode& node, double t_root, double t_parent,
+                int level, double threshold)
 {
     using float_duration = std::chrono::duration<double>;
-    os << std::left << std::setw(25) << std::string(level, ' ')+node.timer.name();
-    os << std::right << std::fixed << std::setprecision(2);
-    os << std::setw(25) << node.timer.count<float_duration>();
-    os << std::setw(25) << node.timer.count<float_duration>()/t_parent*100.0;
-    os << std::setw(25) << node.timer.count<float_duration>()/t_root*100.0;
-    os << std::endl;
-
-    auto sorted_keys = sort(node.nodes);
-    for (const auto& key : sorted_keys)
+    double t_node = node.timer.count<float_duration>();
+    if (t_node/t_root*100.0 > threshold)
     {
-        print_impl(os, *node.nodes.at(key), t_root, node.timer.count<float_duration>(), level+1);
+        os << std::left << std::setw(25) << std::string(level, ' ')+node.timer.name();
+        os << std::right << std::fixed << std::setprecision(2);
+        os << std::setw(25) << t_node;
+        os << std::setw(25) << t_node/t_parent*100.0;
+        os << std::setw(25) << t_node/t_root*100.0;
+        os << std::endl;
+
+        auto sorted_keys = sort(node.nodes);
+        for (const auto& key : sorted_keys)
+        {
+            print_impl(os, *node.nodes.at(key), t_root, t_node, level+1, threshold);
+        }
     }
 }
 
-void print(std::ostream& os, TimerNode& root)
+void print(std::ostream& os, TimerNode& root, double threshold)
 {
     using float_duration = std::chrono::duration<double>;
-    os << std::left << std::setw(25) << "Timer name";
+    os << std::left << std::setw(25);
+    if (threshold > 0.0)
+    {
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(1);
+        oss << "Timer name [> " << threshold << "%]";
+        os << oss.str();
+    }
+    else
+    {
+        os << "Timer name";
+    }
+
     os << std::right;
     os << std::setw(25) << "Time (s)";
     os << std::setw(25) << "Rel. to parent (%)";
     os << std::setw(25) << "Rel. to \'"+root.timer.name()+"\' (%)";
     os << std::endl;
-    print_impl(os, root, root.timer.count<float_duration>(), root.timer.count<float_duration>(), 0);
+    print_impl(os, root, root.timer.count<float_duration>(), root.timer.count<float_duration>(),
+               0, threshold);
 }
 
 

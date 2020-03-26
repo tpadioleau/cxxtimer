@@ -39,7 +39,7 @@ namespace cxxtimer
 
 class TimerNode;
 
-void print(std::ostream& os, TimerNode& node);
+void print(std::ostream& os, TimerNode& node, double threshold);
 
 class TimerNode
 {
