@@ -11,7 +11,7 @@
 namespace cxxtimer
 {
 
-std::list<std::string> sort(std::map<std::string, std::shared_ptr<TimerNode>>& nodes)
+std::list<std::string> sort(const std::map<std::string, std::shared_ptr<TimerNode>>& nodes)
 {
     std::list<std::string> sorted_keys;
     for (const auto& node : nodes)
@@ -26,7 +26,7 @@ std::list<std::string> sort(std::map<std::string, std::shared_ptr<TimerNode>>& n
     return sorted_keys;
 }
 
-void print_impl(std::ostream& os, TimerNode& node, double t_root, double t_parent,
+void print_impl(std::ostream& os, const TimerNode& node, double t_root, double t_parent,
                 int level, double threshold)
 {
     using float_duration = std::chrono::duration<double>;
@@ -48,7 +48,7 @@ void print_impl(std::ostream& os, TimerNode& node, double t_root, double t_paren
     }
 }
 
-void print(std::ostream& os, TimerNode& root, double threshold)
+void print(std::ostream& os, const TimerNode& root, double threshold)
 {
     using float_duration = std::chrono::duration<double>;
     os << std::left << std::setw(25);
