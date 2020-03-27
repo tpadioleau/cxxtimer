@@ -67,8 +67,6 @@ class Profiler
 public:
     Profiler() = default;
 
-    Profiler(const std::string& name);
-
     Profiler(const Profiler& x) = default;
 
     Profiler(Profiler&& x) = default;
@@ -79,20 +77,20 @@ public:
 
     Profiler& operator=(Profiler&& x) = default;
 
-    void reset(const std::string& name);
+    void clear();
 
     Profiler& push(const std::string& name);
 
     Profiler& pop();
 
-    TimerNode& root() const;
-
     void start();
 
     void stop();
 
-    std::shared_ptr<TimerNode> m_root = std::make_shared<TimerNode>("root");
-    std::list<TimerNode*> m_active_nodes = std::list<TimerNode*>(1, m_root.get());
+    const std::list<std::shared_ptr<TimerNode>>& active_timer_nodes() const;
+
+private:
+    std::list<std::shared_ptr<TimerNode>> m_active_timer_nodes;
 };
 
 } // cxxtimer

@@ -6,25 +6,25 @@
 
 int main(int argc, char** argv)
 {
-    cxxtimer::Profiler profiler ("task:0");
+    cxxtimer::Profiler profiler;
 
-    profiler.start();
+    profiler.push("task:0");
     {
         profiler.push("task:1");
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         profiler.pop();
 
         profiler.push("task:2");
-        for (int i=0; i<3; ++i)
+        for (int i=0; i<4; ++i)
         {
-            profiler.push("task:20");
+            profiler.push("task:21");
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            profiler.pop().push("task:21");
+            profiler.pop().push("task:22");
             std::this_thread::sleep_for(std::chrono::milliseconds(30));
-            profiler.pop().push("task:22").pop();
+            profiler.pop().push("task:23").pop(); // To have < 1% timer
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
             profiler.stop();
-            print(std::cout, profiler.root(), 1.0);
+            print(std::cout, *profiler.active_timer_nodes().front(), 1.0);
             profiler.start();
         }
         profiler.pop();
@@ -32,7 +32,8 @@ int main(int argc, char** argv)
     profiler.stop();
 
     std::cout << "Full profile\n";
-    print(std::cout, profiler.root(), -1.0);
+    print(std::cout, *profiler.active_timer_nodes().front(), -1.0);
+    profiler.pop();
 
     return 0;
 }

@@ -36,6 +36,7 @@ void print_impl(std::ostream& os, const TimerNode& node, double t_root, double t
         os << std::left << std::setw(25) << std::string(level, ' ')+node.timer.name();
         os << std::right << std::fixed << std::setprecision(2);
         os << std::setw(25) << t_node;
+        os << std::setw(25) << t_node/node.timer.num_calls();
         os << std::setw(25) << t_node/t_parent*100.0;
         os << std::setw(25) << t_node/t_root*100.0;
         os << std::endl;
@@ -66,6 +67,7 @@ void print(std::ostream& os, const TimerNode& root, double threshold)
 
     os << std::right;
     os << std::setw(25) << "Time (s)";
+    os << std::setw(25) << "Mean time per call (s)";
     os << std::setw(25) << "Rel. to parent (%)";
     os << std::setw(25) << "Rel. to \'"+root.timer.name()+"\' (%)";
     os << std::endl;
@@ -80,52 +82,50 @@ TimerNode::TimerNode(const std::string& name)
 }
 
 
-Profiler::Profiler(const std::string& name)
-    : m_root ( std::make_shared<TimerNode> (name) )
+void Profiler::clear()
 {
-}
-
-void Profiler::reset(const std::string &name)
-{
-    m_root = std::make_shared<TimerNode>(name);
-    m_active_nodes.clear();
-    m_active_nodes.push_back(m_root.get());
+    m_active_timer_nodes.clear();
 }
 
 Profiler& Profiler::push(const std::string& name)
 {
-    auto node = std::make_shared<TimerNode>(name);
-
-    auto tuple = m_active_nodes.back()->nodes.insert(std::make_pair(name, node));
-    // If not inserted, retrieves existing node
-    if (!tuple.second)
+    if (m_active_timer_nodes.empty())
     {
-        node = tuple.first->second;
+        m_active_timer_nodes.push_back(std::make_shared<TimerNode>(name));
+        m_active_timer_nodes.back()->timer.start();
+        m_active_timer_nodes.back()->timer.increment_num_calls();
+    }
+    else
+    {
+        auto tuple = m_active_timer_nodes.back()->nodes.emplace(name, std::make_shared<TimerNode>(name));
+
+        // If not inserted, retrieves existing node
+        m_active_timer_nodes.push_back(tuple.first->second);
+
+        if (m_active_timer_nodes.front()->timer.is_started())
+        {
+            m_active_timer_nodes.back()->timer.start();
+            m_active_timer_nodes.back()->timer.increment_num_calls();
+        }
     }
 
-    m_active_nodes.push_back(node.get());
-
-    if (m_root->timer.is_started())
-    {
-        node->timer.start();
-    }
     return *this;
 }
 
 Profiler& Profiler::pop()
 {
-    if (m_active_nodes.back() != m_root.get())
+    if (!m_active_timer_nodes.empty())
     {
-        m_active_nodes.back()->timer.stop();
-        m_active_nodes.pop_back();
+        m_active_timer_nodes.back()->timer.stop();
+        m_active_timer_nodes.pop_back();
     }
     return *this;
 }
 
 void Profiler::start()
 {
-    std::for_each(m_active_nodes.cbegin(), m_active_nodes.cend(),
-                  [] (TimerNode* node)
+    std::for_each(m_active_timer_nodes.cbegin(), m_active_timer_nodes.cend(),
+                  [] (const std::shared_ptr<TimerNode>& node)
                   {
                       node->timer.start();
                   });
@@ -133,16 +133,16 @@ void Profiler::start()
 
 void Profiler::stop()
 {
-    std::for_each(m_active_nodes.crbegin(), m_active_nodes.crend(),
-                  [] (TimerNode* node)
+    std::for_each(m_active_timer_nodes.crbegin(), m_active_timer_nodes.crend(),
+                  [] (const std::shared_ptr<TimerNode>& node)
                   {
                       node->timer.stop();
                   });
 }
 
-TimerNode& Profiler::root() const
+const std::list<std::shared_ptr<TimerNode>>& Profiler::active_timer_nodes() const
 {
-    return *m_root;
+    return m_active_timer_nodes;
 }
 
 }  // cxxtimer
