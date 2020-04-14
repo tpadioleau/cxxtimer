@@ -19,9 +19,10 @@ int main(int argc, char** argv)
         {
             profiler.push("task:21");
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            profiler.pop().push("task:22");
+            profiler.pop().push("task:22"); // To have < 1% timer
+            profiler.pop().push("task:23");
             std::this_thread::sleep_for(std::chrono::milliseconds(30));
-            profiler.pop().push("task:23").pop(); // To have < 1% timer
+            profiler.pop();
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
             profiler.stop();
             print(std::cout, *profiler.active_timer_nodes().front(), 1.0);
