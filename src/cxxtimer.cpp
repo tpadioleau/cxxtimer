@@ -1,12 +1,15 @@
 #include "cxxtimer/cxxtimer.hpp"
 #include <string>
 
-cxxtimer::Timer::Timer(const std::string& name)
+namespace cxxtimer
+{
+
+Timer::Timer(const std::string& name)
     : m_name ( name )
 {
 }
 
-void cxxtimer::Timer::start()
+void Timer::start()
 {
     if (m_stopped)
     {
@@ -15,7 +18,7 @@ void cxxtimer::Timer::start()
     }
 }
 
-void cxxtimer::Timer::stop()
+void Timer::stop()
 {
     if (!m_stopped)
     {
@@ -24,7 +27,7 @@ void cxxtimer::Timer::stop()
     }
 }
 
-void cxxtimer::Timer::reset()
+void Timer::reset()
 {
     m_stopped = true;
     m_reference = clock::now();
@@ -32,22 +35,24 @@ void cxxtimer::Timer::reset()
     m_num_calls = 0;
 }
 
-bool cxxtimer::Timer::is_started() const
+bool Timer::is_started() const
 {
     return !m_stopped;
 }
 
-void cxxtimer::Timer::increment_num_calls()
+void Timer::increment_num_calls()
 {
     m_num_calls++;
 }
 
-std::size_t cxxtimer::Timer::num_calls() const
+std::size_t Timer::num_calls() const
 {
     return m_num_calls;
 }
 
-std::string cxxtimer::Timer::name() const
+std::string Timer::name() const
 {
     return m_name;
 }
+
+} // namespace cxxtimer

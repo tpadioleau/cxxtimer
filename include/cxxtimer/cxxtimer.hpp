@@ -151,8 +151,6 @@ private:
     std::size_t m_num_calls = 0;
 };
 
-}
-
 template <class duration_t>
 typename duration_t::rep cxxtimer::Timer::count() const
 {
@@ -162,4 +160,6 @@ typename duration_t::rep cxxtimer::Timer::count() const
         duration += clock::now() - m_reference;
     }
     return std::chrono::duration_cast<duration_t>(duration).count();
+}
+
 }
