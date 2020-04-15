@@ -50,7 +50,7 @@ public:
      * @param   name
      *          Sets the name of this timer.
      */
-    Timer(const std::string& name);
+    Timer( const std::string& name );
 
     /**
      * Copy constructor.
@@ -58,7 +58,7 @@ public:
      * @param   x
      *          The object to be copied.
      */
-    Timer(const Timer& x) = default;
+    Timer( const Timer& x ) = default;
 
     /**
      * Move constructor.
@@ -66,7 +66,7 @@ public:
      * @param   x
      *          The object to be transfered.
      */
-    Timer(Timer&& x) = default;
+    Timer( Timer&& x ) = default;
 
     /**
      * Destructor.
@@ -81,7 +81,7 @@ public:
      *
      * @return  A reference to this object.
      */
-    Timer& operator=(const Timer& x) = default;
+    Timer& operator=( const Timer& x ) = default;
 
     /**
      * Move assignment operator.
@@ -91,7 +91,7 @@ public:
      *
      * @return  A reference to this object.
      */
-    Timer& operator=(Timer&& x) = default;
+    Timer& operator=( Timer&& x ) = default;
 
     /**
      * Starts the timer.
@@ -138,7 +138,7 @@ public:
      *
      * @return  The elapsed time.
      */
-    template <class duration_t = std::chrono::milliseconds>
+    template < class duration_t = std::chrono::milliseconds >
     typename duration_t::rep count() const;
 
 private:
@@ -151,15 +151,16 @@ private:
     std::size_t m_num_calls = 0;
 };
 
-template <class duration_t>
-typename duration_t::rep cxxtimer::Timer::count() const
+template < class duration_t >
+typename duration_t::rep
+cxxtimer::Timer::count() const
 {
     clock::duration duration = m_accumulated;
-    if (!m_stopped)
+    if ( !m_stopped )
     {
         duration += clock::now() - m_reference;
     }
-    return std::chrono::duration_cast<duration_t>(duration).count();
+    return std::chrono::duration_cast< duration_t >( duration ).count();
 }
 
-}
+} // namespace cxxtimer

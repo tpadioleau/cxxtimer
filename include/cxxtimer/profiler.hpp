@@ -29,9 +29,9 @@ SOFTWARE.
 #include "cxxtimer/cxxtimer.hpp"
 
 #include <iostream>
+#include <list>
 #include <map>
 #include <memory>
-#include <list>
 #include <string>
 
 namespace cxxtimer
@@ -39,27 +39,27 @@ namespace cxxtimer
 
 class TimerNode;
 
-void print(std::ostream& os, const TimerNode& node, double threshold);
+void print( std::ostream& os, const TimerNode& node, double threshold );
 
 class TimerNode
 {
 public:
     TimerNode() = default;
 
-    TimerNode(const std::string& name);
+    TimerNode( const std::string& name );
 
-    TimerNode(const TimerNode& x) = default;
+    TimerNode( const TimerNode& x ) = default;
 
-    TimerNode(TimerNode&& x) = default;
+    TimerNode( TimerNode&& x ) = default;
 
     virtual ~TimerNode() = default;
 
-    TimerNode& operator=(const TimerNode& x) = default;
+    TimerNode& operator=( const TimerNode& x ) = default;
 
-    TimerNode& operator=(TimerNode&& x) = default;
+    TimerNode& operator=( TimerNode&& x ) = default;
 
     Timer timer;
-    std::map<std::string, std::shared_ptr<TimerNode>> nodes;
+    std::map< std::string, std::shared_ptr< TimerNode > > nodes;
 };
 
 class Profiler
@@ -67,19 +67,19 @@ class Profiler
 public:
     Profiler() = default;
 
-    Profiler(const Profiler& x) = default;
+    Profiler( const Profiler& x ) = default;
 
-    Profiler(Profiler&& x) = default;
+    Profiler( Profiler&& x ) = default;
 
     virtual ~Profiler() = default;
 
-    Profiler& operator=(const Profiler& x) = default;
+    Profiler& operator=( const Profiler& x ) = default;
 
-    Profiler& operator=(Profiler&& x) = default;
+    Profiler& operator=( Profiler&& x ) = default;
 
     void clear();
 
-    Profiler& push(const std::string& name);
+    Profiler& push( const std::string& name );
 
     Profiler& pop();
 
@@ -87,10 +87,10 @@ public:
 
     void stop();
 
-    const std::list<std::shared_ptr<TimerNode>>& active_timer_nodes() const;
+    const std::list< std::shared_ptr< TimerNode > >& active_timer_nodes() const;
 
 private:
-    std::list<std::shared_ptr<TimerNode>> m_active_timer_nodes;
+    std::list< std::shared_ptr< TimerNode > > m_active_timer_nodes;
 };
 
-} // cxxtimer
+} // namespace cxxtimer

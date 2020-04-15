@@ -24,14 +24,14 @@ SOFTWARE.
 
 */
 
-
 #include <chrono>
 #include <cstdlib>
 #include <cxxtimer/cxxtimer.hpp>
 #include <iostream>
 #include <thread>
 
-int main()
+int
+main()
 {
     // Instantiate cxxtimer::Timer object
     cxxtimer::Timer timer;
@@ -41,7 +41,7 @@ int main()
     // Start the timer
     timer.start();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
 
     // Stop/pause the timer
     timer.stop();
@@ -51,7 +51,7 @@ int main()
     std::cout << " done\n";
     std::cout << "Timer shows " << count << "ms\n";
 
-    if (count > 51 || count < 49)
+    if ( count > 51 || count < 49 )
     {
         return EXIT_FAILURE;
     }
