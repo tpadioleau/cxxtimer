@@ -145,7 +145,7 @@ private:
     using clock = std::chrono::steady_clock;
 
     std::string m_name = "Unknown";
-    bool m_stopped = true;
+    bool m_is_started = false;
     clock::time_point m_reference = clock::now();
     clock::duration m_accumulated = clock::duration::zero();
     std::size_t m_num_calls = 0;
@@ -156,7 +156,7 @@ typename duration_t::rep
 cxxtimer::Timer::count() const
 {
     clock::duration duration = m_accumulated;
-    if ( !m_stopped )
+    if ( m_is_started )
     {
         duration += clock::now() - m_reference;
     }

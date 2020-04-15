@@ -12,27 +12,27 @@ Timer::Timer( const std::string& name )
 void
 Timer::start()
 {
-    if ( m_stopped )
+    if ( !m_is_started )
     {
         m_reference = clock::now();
-        m_stopped = false;
+        m_is_started = true;
     }
 }
 
 void
 Timer::stop()
 {
-    if ( !m_stopped )
+    if ( m_is_started )
     {
         m_accumulated += clock::now() - m_reference;
-        m_stopped = true;
+        m_is_started = false;
     }
 }
 
 void
 Timer::reset()
 {
-    m_stopped = true;
+    m_is_started = false;
     m_reference = clock::now();
     m_accumulated = clock::duration::zero();
     m_num_calls = 0;
@@ -41,7 +41,7 @@ Timer::reset()
 bool
 Timer::is_started() const
 {
-    return !m_stopped;
+    return m_is_started;
 }
 
 void
