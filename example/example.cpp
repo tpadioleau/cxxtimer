@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <chrono>
 #include <cstdlib>
-#include <cxxtimer/cxxtimer.hpp>
+#include <cxxtimer/Timer.hpp>
 #include <iostream>
 #include <string>
 

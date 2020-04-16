@@ -1,4 +1,4 @@
-#include "cxxtimer/profiler.hpp"
+#include "cxxtimer/Profiler.hpp"
 
 #include <algorithm>
 #include <chrono>

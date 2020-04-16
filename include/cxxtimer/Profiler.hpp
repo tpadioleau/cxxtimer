@@ -26,7 +26,7 @@ SOFTWARE.
 
 #pragma once
 
-#include "cxxtimer/cxxtimer.hpp"
+#include "cxxtimer/Timer.hpp"
 
 #include <iostream>
 #include <list>

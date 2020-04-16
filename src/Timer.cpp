@@ -1,4 +1,4 @@
-#include "cxxtimer/cxxtimer.hpp"
+#include "cxxtimer/Timer.hpp"
 #include <string>
 
 namespace cxxtimer

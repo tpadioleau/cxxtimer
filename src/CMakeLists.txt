@@ -1,4 +1,4 @@
-add_library(cxxtimer STATIC cxxtimer.cpp profiler.cpp)
+add_library(cxxtimer STATIC Profiler.cpp Timer.cpp)
 target_include_directories(cxxtimer
   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
 target_include_directories(cxxtimer
