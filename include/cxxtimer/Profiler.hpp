@@ -87,7 +87,7 @@ public:
 
     void stop();
 
-    const std::vector< std::shared_ptr< TimerNode > >& active_timer_nodes() const;
+    const std::shared_ptr< TimerNode >& root() const;
 
 private:
     std::vector< std::shared_ptr< TimerNode > > m_active_timer_nodes;

@@ -26,7 +26,7 @@ main( int argc, char** argv )
             profiler.pop();
             std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );
             profiler.stop();
-            print( std::cout, *profiler.active_timer_nodes().front(), 1.0 );
+            print( std::cout, *profiler.root(), 1.0 );
             profiler.start();
         }
         profiler.pop();
@@ -34,7 +34,7 @@ main( int argc, char** argv )
     profiler.stop();
 
     std::cout << "Full profile\n";
-    print( std::cout, *profiler.active_timer_nodes().front(), -1.0 );
+    print( std::cout, *profiler.root(), -1.0 );
     profiler.pop();
 
     return 0;

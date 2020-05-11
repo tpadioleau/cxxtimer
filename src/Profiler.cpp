@@ -150,10 +150,10 @@ Profiler::stop()
                    } );
 }
 
-const std::vector< std::shared_ptr< TimerNode > >&
-Profiler::active_timer_nodes() const
+const std::shared_ptr< TimerNode >&
+Profiler::root() const
 {
-    return m_active_timer_nodes;
+    return m_active_timer_nodes.front();
 }
 
 } // namespace cxxtimer
