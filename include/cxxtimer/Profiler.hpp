@@ -29,10 +29,10 @@ SOFTWARE.
 #include "cxxtimer/Timer.hpp"
 
 #include <iostream>
-#include <list>
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace cxxtimer
 {
@@ -59,7 +59,7 @@ public:
     TimerNode& operator=( TimerNode&& x ) = default;
 
     Timer timer;
-    std::map< std::string, std::shared_ptr< TimerNode > > nodes;
+    std::map< std::string, TimerNode > nodes;
 };
 
 class Profiler
@@ -67,17 +67,38 @@ class Profiler
 public:
     Profiler() = default;
 
-    Profiler( const Profiler& x ) = default;
+    Profiler( const Profiler& x )
+        : m_root ( x.m_root )
+    {
+        TimerNode* parent = &m_root;
+        for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
+        {
+            m_active_timer_nodes.push_back(
+                &( parent->nodes.at( timernode_p->timer.name() ) ) );
+            parent = m_active_timer_nodes.back();
+        }
+    }
 
     Profiler( Profiler&& x ) = default;
 
     virtual ~Profiler() = default;
 
-    Profiler& operator=( const Profiler& x ) = default;
+    Profiler& operator=( const Profiler& x )
+    {
+        m_root = x.m_root;
+        TimerNode* parent = &m_root;
+        for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
+        {
+            m_active_timer_nodes.push_back(
+                &( parent->nodes.at( timernode_p->timer.name() ) ) );
+            parent = m_active_timer_nodes.back();
+        }
+        return *this;
+    }
 
     Profiler& operator=( Profiler&& x ) = default;
 
-    void clear();
+    void reset( const std::string& name );
 
     Profiler& push( const std::string& name );
 
@@ -87,10 +108,19 @@ public:
 
     void stop();
 
-    const std::list< std::shared_ptr< TimerNode > >& active_timer_nodes() const;
+    TimerNode& root()
+    {
+        return m_root;
+    }
+
+    const TimerNode& root() const
+    {
+        return m_root;
+    }
 
 private:
-    std::list< std::shared_ptr< TimerNode > > m_active_timer_nodes;
+    TimerNode m_root;
+    std::vector< TimerNode* > m_active_timer_nodes;
 };
 
 } // namespace cxxtimer

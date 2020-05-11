@@ -5,6 +5,7 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <map>
 #include <sstream>
 #include <thread>
@@ -14,7 +15,7 @@ namespace cxxtimer
 {
 
 std::list< std::string >
-sort( const std::map< std::string, std::shared_ptr< TimerNode > >& nodes )
+sort( const std::map< std::string, TimerNode >& nodes )
 {
     std::list< std::string > sorted_keys;
     for ( const auto& node : nodes )
@@ -23,22 +24,23 @@ sort( const std::map< std::string, std::shared_ptr< TimerNode > >& nodes )
     }
     sorted_keys.sort( [ &nodes ]( const std::string& key1,
                                   const std::string& key2 ) {
-        return ( nodes.at( key1 )->timer.count< std::chrono::nanoseconds >() >
-                 nodes.at( key2 )->timer.count< std::chrono::nanoseconds >() );
+        return ( nodes.at( key1 ).timer.count< std::chrono::nanoseconds >() >
+                 nodes.at( key2 ).timer.count< std::chrono::nanoseconds >() );
     } );
     return sorted_keys;
 }
 
 void
 print_impl( std::ostream& os, const TimerNode& node, double t_root,
-            double t_parent, int level, double threshold )
+            double t_parent, int level, double threshold,
+            const std::string& prefix, const std::string& prefix2 )
 {
     using float_duration = std::chrono::duration< double >;
     double t_node = node.timer.count< float_duration >();
     if ( t_node / t_root * 100.0 > threshold )
     {
         os << std::left << std::setw( 25 )
-           << std::string( level, ' ' ) + node.timer.name();
+           << ( prefix + prefix2 + node.timer.name() );
         os << std::right << std::fixed << std::setprecision( 2 );
         os << std::setw( 25 ) << t_node;
         os << std::setw( 25 ) << t_node / node.timer.num_calls();
@@ -47,10 +49,14 @@ print_impl( std::ostream& os, const TimerNode& node, double t_root,
         os << std::endl;
 
         auto sorted_keys = sort( node.nodes );
-        for ( const auto& key : sorted_keys )
+        while ( !sorted_keys.empty() )
         {
-            print_impl( os, *node.nodes.at( key ), t_root, t_node, level + 1,
-                        threshold );
+            std::string prefix_child = prefix + ( level > 0 ? "|   " : "" );
+            std::string prefix2_child = ( sorted_keys.size() > 1 ? "|-- " : "\\-- " );
+            print_impl( os, node.nodes.at( sorted_keys.front() ), t_root,
+                        t_node, level + 1, threshold, prefix_child,
+                        prefix2_child );
+            sorted_keys.pop_front();
         }
     }
 }
@@ -79,7 +85,7 @@ print( std::ostream& os, const TimerNode& root, double threshold )
     os << std::setw( 25 ) << "Rel. to \'" + root.timer.name() + "\' (%)";
     os << std::endl;
     print_impl( os, root, root.timer.count< float_duration >(),
-                root.timer.count< float_duration >(), 0, threshold );
+                root.timer.count< float_duration >(), 0, threshold, "", "" );
 }
 
 TimerNode::TimerNode( const std::string& name )
@@ -88,33 +94,35 @@ TimerNode::TimerNode( const std::string& name )
 }
 
 void
-Profiler::clear()
+Profiler::reset( const std::string& name )
 {
-    m_active_timer_nodes.clear();
+    m_root = TimerNode( name );
+    m_root.timer.increment_num_calls();
 }
 
 Profiler&
 Profiler::push( const std::string& name )
 {
+    TimerNode* parent;
     if ( m_active_timer_nodes.empty() )
     {
-        m_active_timer_nodes.push_back( std::make_shared< TimerNode >( name ) );
-        m_active_timer_nodes.back()->timer.start();
-        m_active_timer_nodes.back()->timer.increment_num_calls();
+        parent = &m_root;
     }
     else
     {
-        auto tuple = m_active_timer_nodes.back()->nodes.emplace(
-            name, std::make_shared< TimerNode >( name ) );
+        parent = m_active_timer_nodes.back();
+    }
 
-        // If not inserted, retrieves existing node
-        m_active_timer_nodes.push_back( tuple.first->second );
+    auto tuple = parent->nodes.emplace( name, name );
+    auto child = &tuple.first->second;
 
-        if ( m_active_timer_nodes.front()->timer.is_started() )
-        {
-            m_active_timer_nodes.back()->timer.start();
-            m_active_timer_nodes.back()->timer.increment_num_calls();
-        }
+    // If not inserted, retrieves existing node
+    m_active_timer_nodes.push_back( child );
+
+    if ( parent->timer.is_started() )
+    {
+        child->timer.start();
+        child->timer.increment_num_calls();
     }
 
     return *this;
@@ -134,25 +142,17 @@ Profiler::pop()
 void
 Profiler::start()
 {
+    m_root.timer.start();
     std::for_each( m_active_timer_nodes.cbegin(), m_active_timer_nodes.cend(),
-                   []( const std::shared_ptr< TimerNode >& node ) {
-                       node->timer.start();
-                   } );
+                   []( TimerNode* node ) { node->timer.start(); } );
 }
 
 void
 Profiler::stop()
 {
     std::for_each( m_active_timer_nodes.crbegin(), m_active_timer_nodes.crend(),
-                   []( const std::shared_ptr< TimerNode >& node ) {
-                       node->timer.stop();
-                   } );
-}
-
-const std::list< std::shared_ptr< TimerNode > >&
-Profiler::active_timer_nodes() const
-{
-    return m_active_timer_nodes;
+                   []( TimerNode* node ) { node->timer.stop(); } );
+    m_root.timer.stop();
 }
 
 } // namespace cxxtimer
