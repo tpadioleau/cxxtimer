@@ -32,7 +32,7 @@ sort( const std::map< std::string, std::shared_ptr< TimerNode > >& nodes )
 
 void
 print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
-            double threshold )
+            double threshold, const std::string& prefix )
 {
     using float_duration = std::chrono::duration< double >;
     auto t_parent = parent.timer.count< float_duration >();
@@ -46,7 +46,8 @@ print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
         const auto& node = parent.nodes.at( sorted_keys.front() );
         double t_node = node->timer.count< float_duration >();
         os << std::left << std::setw( 25 )
-           << std::string( level, ' ' ) + node->timer.name();
+           << prefix + ( sorted_keys.size() > 1 ? "|- " : "\\- " ) +
+                  node->timer.name();
         os << std::right << std::fixed << std::setprecision( 2 );
         os << std::setw( 25 ) << t_node;
         os << std::setw( 25 ) << t_node / node->timer.num_calls();
@@ -54,7 +55,8 @@ print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
         os << std::setw( 25 ) << t_node / t_root * 100.0;
         os << std::endl;
 
-        print_impl( os, *node, t_root, level + 1, threshold );
+        print_impl( os, *node, t_root, level + 1, threshold,
+                    prefix + ( sorted_keys.size() > 1 ? "|  " : "   " ) );
 
         sorted_keys.pop_front();
     }
@@ -93,7 +95,7 @@ print( std::ostream& os, const TimerNode& root, double threshold )
     os << std::setw( 25 ) << 100.0;
     os << std::endl;
 
-    print_impl( os, root, t_root, 1, threshold );
+    print_impl( os, root, t_root, 1, threshold, "" );
 }
 
 TimerNode::TimerNode( const std::string& name )
