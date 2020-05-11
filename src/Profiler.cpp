@@ -5,6 +5,7 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <map>
 #include <sstream>
 #include <thread>
@@ -149,7 +150,7 @@ Profiler::stop()
                    } );
 }
 
-const std::list< std::shared_ptr< TimerNode > >&
+const std::vector< std::shared_ptr< TimerNode > >&
 Profiler::active_timer_nodes() const
 {
     return m_active_timer_nodes;

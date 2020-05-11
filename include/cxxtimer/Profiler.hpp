@@ -29,10 +29,10 @@ SOFTWARE.
 #include "cxxtimer/Timer.hpp"
 
 #include <iostream>
-#include <list>
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace cxxtimer
 {
@@ -87,10 +87,10 @@ public:
 
     void stop();
 
-    const std::list< std::shared_ptr< TimerNode > >& active_timer_nodes() const;
+    const std::vector< std::shared_ptr< TimerNode > >& active_timer_nodes() const;
 
 private:
-    std::list< std::shared_ptr< TimerNode > > m_active_timer_nodes;
+    std::vector< std::shared_ptr< TimerNode > > m_active_timer_nodes;
 };
 
 } // namespace cxxtimer
