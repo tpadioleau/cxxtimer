@@ -14,18 +14,17 @@
 namespace cxxtimer
 {
 
-std::list< std::string >
+std::list< TimerNode* >
 sort( const std::map< std::string, std::shared_ptr< TimerNode > >& nodes )
 {
-    std::list< std::string > sorted_keys;
+    std::list< TimerNode* > sorted_keys;
     for ( const auto& node : nodes )
     {
-        sorted_keys.push_back( node.first );
+        sorted_keys.push_back( node.second.get() );
     }
-    sorted_keys.sort( [ &nodes ]( const std::string& key1,
-                                  const std::string& key2 ) {
-        return ( nodes.at( key1 )->timer.count< std::chrono::nanoseconds >() >
-                 nodes.at( key2 )->timer.count< std::chrono::nanoseconds >() );
+    sorted_keys.sort( []( const TimerNode* node1, const TimerNode* node2 ) {
+        return ( node1->timer.count< std::chrono::nanoseconds >() >
+                 node2->timer.count< std::chrono::nanoseconds >() );
     } );
     return sorted_keys;
 }
@@ -36,17 +35,17 @@ print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
 {
     using float_duration = std::chrono::duration< double >;
     auto t_parent = parent.timer.count< float_duration >();
-    auto sorted_keys = sort( parent.nodes );
-    sorted_keys.remove_if( [ & ]( const std::string& str ) {
-        return !( ( parent.nodes.at( str )->timer.count< float_duration >() /
-                    t_root * 100.0 ) > threshold );
+    auto sorted_nodes = sort( parent.nodes );
+    sorted_nodes.remove_if( [ & ]( const TimerNode* node ) {
+        return !( ( node->timer.count< float_duration >() / t_root * 100.0 ) >
+                  threshold );
     } );
-    while ( !sorted_keys.empty() )
+    while ( !sorted_nodes.empty() )
     {
-        const auto& node = parent.nodes.at( sorted_keys.front() );
-        double t_node = node->timer.count< float_duration >();
+        const TimerNode* node = sorted_nodes.front();
+        auto t_node = node->timer.count< float_duration >();
         os << std::left << std::setw( 25 )
-           << prefix + ( sorted_keys.size() > 1 ? "|- " : "\\- " ) +
+           << prefix + ( sorted_nodes.size() > 1 ? "|- " : "\\- " ) +
                   node->timer.name();
         os << std::right << std::fixed << std::setprecision( 2 );
         os << std::setw( 25 ) << t_node;
@@ -56,9 +55,9 @@ print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
         os << std::endl;
 
         print_impl( os, *node, t_root, level + 1, threshold,
-                    prefix + ( sorted_keys.size() > 1 ? "|  " : "   " ) );
+                    prefix + ( sorted_nodes.size() > 1 ? "|  " : "   " ) );
 
-        sorted_keys.pop_front();
+        sorted_nodes.pop_front();
     }
 }
 
