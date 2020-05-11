@@ -48,10 +48,11 @@ print_impl( std::ostream& os, const TimerNode& node, double t_root,
         os << std::endl;
 
         auto sorted_keys = sort( node.nodes );
-        for ( const auto& key : sorted_keys )
+        while ( !sorted_keys.empty() )
         {
-            print_impl( os, *node.nodes.at( key ), t_root, t_node, level + 1,
-                        threshold );
+            print_impl( os, *node.nodes.at( sorted_keys.front() ), t_root,
+                        t_node, level + 1, threshold );
+            sorted_keys.pop_front();
         }
     }
 }
