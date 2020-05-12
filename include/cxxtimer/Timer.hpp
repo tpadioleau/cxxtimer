@@ -39,6 +39,8 @@ namespace cxxtimer
 class Timer
 {
 public:
+    using clock = std::chrono::steady_clock;
+
     /**
      * Constructor.
      */
@@ -129,6 +131,13 @@ public:
     std::string name() const;
 
     /**
+     * Returns exact elapsed time as a std::chrono::duration object.
+     *
+     * @return Exact elapsed time.
+     */
+    clock::duration duration() const;
+
+    /**
      * Returns the elapsed time.
      *
      * @param   duration_t
@@ -142,8 +151,6 @@ public:
     typename duration_t::rep count() const;
 
 private:
-    using clock = std::chrono::steady_clock;
-
     std::string m_name = "Unknown";
     bool m_is_started = false;
     clock::time_point m_reference = clock::now();
@@ -155,12 +162,8 @@ template < class duration_t >
 typename duration_t::rep
 cxxtimer::Timer::count() const
 {
-    clock::duration duration = m_accumulated;
-    if ( m_is_started )
-    {
-        duration += clock::now() - m_reference;
-    }
-    return std::chrono::duration_cast< duration_t >( duration ).count();
+    using std::chrono::duration_cast;
+    return duration_cast< duration_t >( Timer::duration() ).count();
 }
 
 } // namespace cxxtimer
