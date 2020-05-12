@@ -46,12 +46,12 @@ main()
     // Stop/pause the timer
     timer.stop();
 
-    auto count = timer.count();
+    auto seconds = timer.seconds();
 
     std::cout << " done\n";
-    std::cout << "Timer shows " << count << "ms\n";
+    std::cout << "Timer shows " << seconds << "s\n";
 
-    if ( count > 51 || count < 49 )
+    if ( seconds > 0.051 || seconds < 0.049 )
     {
         return EXIT_FAILURE;
     }

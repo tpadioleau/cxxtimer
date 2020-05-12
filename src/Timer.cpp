@@ -55,6 +55,13 @@ Timer::duration() const
     return duration;
 }
 
+double
+Timer::seconds() const
+{
+    auto duration = std::chrono::duration< double >( Timer::duration() );
+    return duration.count();
+}
+
 void
 Timer::increment_num_calls()
 {

@@ -138,6 +138,13 @@ public:
     clock::duration duration() const;
 
     /**
+     * Helper function returning elapsed time in seconds as double.
+     *
+     * @return Elapsed time.
+     */
+    double seconds() const;
+
+    /**
      * Returns the elapsed time.
      *
      * @param   duration_t
