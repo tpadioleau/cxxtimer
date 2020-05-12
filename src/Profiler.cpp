@@ -23,8 +23,7 @@ sort( const std::map< std::string, std::shared_ptr< TimerNode > >& nodes )
         sorted_keys.push_back( node.second.get() );
     }
     sorted_keys.sort( []( const TimerNode* node1, const TimerNode* node2 ) {
-        return ( node1->timer.count< std::chrono::nanoseconds >() >
-                 node2->timer.count< std::chrono::nanoseconds >() );
+        return ( node1->timer.duration() > node2->timer.duration() );
     } );
     return sorted_keys;
 }
@@ -33,17 +32,15 @@ void
 print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
             double threshold, const std::string& prefix )
 {
-    using float_duration = std::chrono::duration< double >;
-    auto t_parent = parent.timer.count< float_duration >();
+    auto t_parent = parent.timer.seconds();
     auto sorted_nodes = sort( parent.nodes );
     sorted_nodes.remove_if( [ & ]( const TimerNode* node ) {
-        return !( ( node->timer.count< float_duration >() / t_root * 100.0 ) >
-                  threshold );
+        return !( ( node->timer.seconds() / t_root * 100.0 ) > threshold );
     } );
     while ( !sorted_nodes.empty() )
     {
         const TimerNode* node = sorted_nodes.front();
-        auto t_node = node->timer.count< float_duration >();
+        auto t_node = node->timer.seconds();
         os << std::left << std::setw( 25 )
            << prefix + ( sorted_nodes.size() > 1 ? "|- " : "\\- " ) +
                   node->timer.name();
@@ -64,7 +61,6 @@ print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
 void
 print( std::ostream& os, const TimerNode& root, double threshold )
 {
-    using float_duration = std::chrono::duration< double >;
     os << std::left << std::setw( 25 );
     if ( threshold > 0.0 )
     {
@@ -85,7 +81,7 @@ print( std::ostream& os, const TimerNode& root, double threshold )
     os << std::setw( 25 ) << "Rel. to \'" + root.timer.name() + "\' (%)";
     os << std::endl;
 
-    auto t_root = root.timer.count< float_duration >();
+    auto t_root = root.timer.seconds();
     os << std::left << std::setw( 25 ) << root.timer.name();
     os << std::right << std::fixed << std::setprecision( 2 );
     os << std::setw( 25 ) << t_root;
