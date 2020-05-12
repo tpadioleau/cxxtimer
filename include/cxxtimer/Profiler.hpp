@@ -67,34 +67,13 @@ class Profiler
 public:
     Profiler() = default;
 
-    Profiler( const Profiler& x )
-        : m_root ( x.m_root )
-    {
-        TimerNode* parent = &m_root;
-        for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
-        {
-            m_active_timer_nodes.push_back(
-                &( parent->nodes.at( timernode_p->timer.name() ) ) );
-            parent = m_active_timer_nodes.back();
-        }
-    }
+    Profiler( const Profiler& x );
 
     Profiler( Profiler&& x ) = default;
 
     virtual ~Profiler() = default;
 
-    Profiler& operator=( const Profiler& x )
-    {
-        m_root = x.m_root;
-        TimerNode* parent = &m_root;
-        for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
-        {
-            m_active_timer_nodes.push_back(
-                &( parent->nodes.at( timernode_p->timer.name() ) ) );
-            parent = m_active_timer_nodes.back();
-        }
-        return *this;
-    }
+    Profiler& operator=( const Profiler& x );
 
     Profiler& operator=( Profiler&& x ) = default;
 
@@ -108,15 +87,7 @@ public:
 
     void stop();
 
-    TimerNode& root()
-    {
-        return m_root;
-    }
-
-    const TimerNode& root() const
-    {
-        return m_root;
-    }
+    const TimerNode& root() const;
 
 private:
     TimerNode m_root;

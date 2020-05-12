@@ -44,6 +44,24 @@ Timer::is_started() const
     return m_is_started;
 }
 
+Timer::clock::duration
+Timer::duration() const
+{
+    clock::duration duration = m_accumulated;
+    if ( m_is_started )
+    {
+        duration += clock::now() - m_reference;
+    }
+    return duration;
+}
+
+double
+Timer::seconds() const
+{
+    auto duration = std::chrono::duration< double >( Timer::duration() );
+    return duration.count();
+}
+
 void
 Timer::increment_num_calls()
 {

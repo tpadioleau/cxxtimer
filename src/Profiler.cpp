@@ -14,57 +14,55 @@
 namespace cxxtimer
 {
 
-std::list< std::string >
+std::list< const TimerNode* >
 sort( const std::map< std::string, TimerNode >& nodes )
 {
-    std::list< std::string > sorted_keys;
+    std::list< const TimerNode* > sorted_nodes;
     for ( const auto& node : nodes )
     {
-        sorted_keys.push_back( node.first );
+        sorted_nodes.push_back( &node.second );
     }
-    sorted_keys.sort( [ &nodes ]( const std::string& key1,
-                                  const std::string& key2 ) {
-        return ( nodes.at( key1 ).timer.count< std::chrono::nanoseconds >() >
-                 nodes.at( key2 ).timer.count< std::chrono::nanoseconds >() );
+    sorted_nodes.sort( []( const TimerNode* node1, const TimerNode* node2 ) {
+        return ( node1->timer.duration() > node2->timer.duration() );
     } );
-    return sorted_keys;
+    return sorted_nodes;
 }
 
 void
-print_impl( std::ostream& os, const TimerNode& node, double t_root,
-            double t_parent, int level, double threshold,
-            const std::string& prefix, const std::string& prefix2 )
+print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
+            double threshold, const std::string& prefix )
 {
-    using float_duration = std::chrono::duration< double >;
-    double t_node = node.timer.count< float_duration >();
-    if ( t_node / t_root * 100.0 > threshold )
+    auto t_parent = parent.timer.seconds();
+
+    auto sorted_nodes = sort( parent.nodes );
+    sorted_nodes.remove_if( [ & ]( const TimerNode* node ) {
+        return !( ( node->timer.seconds() / t_root * 100.0 ) > threshold );
+    } );
+
+    while ( !sorted_nodes.empty() )
     {
+        const TimerNode* node = sorted_nodes.front();
+        auto t_node = node->timer.seconds();
         os << std::left << std::setw( 25 )
-           << ( prefix + prefix2 + node.timer.name() );
+           << prefix + ( sorted_nodes.size() > 1 ? "|- " : "\\- " ) +
+                  node->timer.name();
         os << std::right << std::fixed << std::setprecision( 2 );
         os << std::setw( 25 ) << t_node;
-        os << std::setw( 25 ) << t_node / node.timer.num_calls();
+        os << std::setw( 25 ) << t_node / node->timer.num_calls();
         os << std::setw( 25 ) << t_node / t_parent * 100.0;
         os << std::setw( 25 ) << t_node / t_root * 100.0;
         os << std::endl;
 
-        auto sorted_keys = sort( node.nodes );
-        while ( !sorted_keys.empty() )
-        {
-            std::string prefix_child = prefix + ( level > 0 ? "|   " : "" );
-            std::string prefix2_child = ( sorted_keys.size() > 1 ? "|-- " : "\\-- " );
-            print_impl( os, node.nodes.at( sorted_keys.front() ), t_root,
-                        t_node, level + 1, threshold, prefix_child,
-                        prefix2_child );
-            sorted_keys.pop_front();
-        }
+        print_impl( os, *node, t_root, level + 1, threshold,
+                    prefix + ( sorted_nodes.size() > 1 ? "|  " : "   " ) );
+
+        sorted_nodes.pop_front();
     }
 }
 
 void
 print( std::ostream& os, const TimerNode& root, double threshold )
 {
-    using float_duration = std::chrono::duration< double >;
     os << std::left << std::setw( 25 );
     if ( threshold > 0.0 )
     {
@@ -84,13 +82,48 @@ print( std::ostream& os, const TimerNode& root, double threshold )
     os << std::setw( 25 ) << "Rel. to parent (%)";
     os << std::setw( 25 ) << "Rel. to \'" + root.timer.name() + "\' (%)";
     os << std::endl;
-    print_impl( os, root, root.timer.count< float_duration >(),
-                root.timer.count< float_duration >(), 0, threshold, "", "" );
+
+    auto t_root = root.timer.seconds();
+    os << std::left << std::setw( 25 ) << root.timer.name();
+    os << std::right << std::fixed << std::setprecision( 2 );
+    os << std::setw( 25 ) << t_root;
+    os << std::setw( 25 ) << t_root / root.timer.num_calls();
+    os << std::setw( 25 ) << 100.0;
+    os << std::setw( 25 ) << 100.0;
+    os << std::endl;
+
+    print_impl( os, root, t_root, 1, threshold, "" );
 }
 
 TimerNode::TimerNode( const std::string& name )
     : timer( name )
 {
+}
+
+Profiler::Profiler( const Profiler& x )
+    : m_root( x.m_root )
+{
+    TimerNode* parent = &m_root;
+    for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
+    {
+        m_active_timer_nodes.push_back(
+            &( parent->nodes.at( timernode_p->timer.name() ) ) );
+        parent = m_active_timer_nodes.back();
+    }
+}
+
+Profiler&
+Profiler::operator=( const Profiler& x )
+{
+    m_root = x.m_root;
+    TimerNode* parent = &m_root;
+    for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
+    {
+        m_active_timer_nodes.push_back(
+            &( parent->nodes.at( timernode_p->timer.name() ) ) );
+        parent = m_active_timer_nodes.back();
+    }
+    return *this;
 }
 
 void
@@ -153,6 +186,12 @@ Profiler::stop()
     std::for_each( m_active_timer_nodes.crbegin(), m_active_timer_nodes.crend(),
                    []( TimerNode* node ) { node->timer.stop(); } );
     m_root.timer.stop();
+}
+
+const TimerNode&
+Profiler::root() const
+{
+    return m_root;
 }
 
 } // namespace cxxtimer
