@@ -115,13 +115,16 @@ Profiler::Profiler( const Profiler& x )
 Profiler&
 Profiler::operator=( const Profiler& x )
 {
-    m_root = x.m_root;
-    TimerNode* parent = &m_root;
-    for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
+    if ( this != &x )
     {
-        m_active_timer_nodes.push_back(
-            &( parent->nodes.at( timernode_p->timer.name() ) ) );
-        parent = m_active_timer_nodes.back();
+        m_root = x.m_root;
+        TimerNode* parent = &m_root;
+        for ( const TimerNode* timernode_p : x.m_active_timer_nodes )
+        {
+            m_active_timer_nodes.push_back(
+                &( parent->nodes.at( timernode_p->timer.name() ) ) );
+            parent = m_active_timer_nodes.back();
+        }
     }
     return *this;
 }
