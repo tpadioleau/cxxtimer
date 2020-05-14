@@ -38,10 +38,12 @@ main()
 
     std::cout << "Waiting for 50ms...";
 
+    auto fifty_ms = std::chrono::milliseconds( 50 );
+
     // Start the timer
     timer.start();
 
-    std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
+    std::this_thread::sleep_for( fifty_ms );
 
     // Stop/pause the timer
     timer.stop();
