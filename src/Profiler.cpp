@@ -14,6 +14,9 @@
 namespace cxxtimer
 {
 
+namespace
+{
+
 std::list< const TimerNode* >
 sort( const std::map< std::string, TimerNode >& nodes )
 {
@@ -59,6 +62,8 @@ print_impl( std::ostream& os, const TimerNode& parent, double t_root, int level,
         sorted_nodes.pop_front();
     }
 }
+
+} // namespace
 
 void
 print( std::ostream& os, const TimerNode& root, double threshold )
