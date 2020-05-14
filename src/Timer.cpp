@@ -4,8 +4,8 @@
 namespace cxxtimer
 {
 
-Timer::Timer( const std::string& name )
-    : m_name( name )
+Timer::Timer( std::string name )
+    : m_name( std::move( name ) )
 {
 }
 

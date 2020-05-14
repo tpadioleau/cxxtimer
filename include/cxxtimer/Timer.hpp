@@ -52,7 +52,7 @@ public:
      * @param   name
      *          Sets the name of this timer.
      */
-    Timer( const std::string& name );
+    Timer( std::string name );
 
     /**
      * Copy constructor.
