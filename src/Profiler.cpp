@@ -150,7 +150,7 @@ Profiler::push( const std::string& name )
     }
 
     auto tuple = parent->nodes.emplace( name, name );
-    auto child = &tuple.first->second;
+    auto* child = &tuple.first->second;
 
     // If not inserted, retrieves existing node
     m_active_timer_nodes.push_back( child );
