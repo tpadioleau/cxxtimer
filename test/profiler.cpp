@@ -5,7 +5,7 @@
 #include <thread>
 
 int
-main( int argc, char** argv )
+main()
 {
     cxxtimer::Profiler profiler;
     profiler.reset( "task:0" );
